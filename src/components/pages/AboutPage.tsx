@@ -1,0 +1,216 @@
+import { useEffect, useState } from 'react';
+import { BaseCrudService } from '@/integrations';
+import { LibraryInformation, LibraryPhotos } from '@/entities';
+import { Image } from '@/components/ui/image';
+import { Calendar, MapPin, Users } from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { format } from 'date-fns';
+
+export default function AboutPage() {
+  const [libraryInfo, setLibraryInfo] = useState<LibraryInformation | null>(null);
+  const [photos, setPhotos] = useState<LibraryPhotos[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { items: info } = await BaseCrudService.getAll<LibraryInformation>('libraryinformation');
+      if (info.length > 0) {
+        setLibraryInfo(info[0]);
+      }
+      
+      const { items: photoItems } = await BaseCrudService.getAll<LibraryPhotos>('libraryphotos');
+      setPhotos(photoItems);
+    };
+    
+    fetchData();
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      {/* Hero Section */}
+      <section className="max-w-[100rem] mx-auto px-6 mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h1 className="font-heading text-5xl font-bold text-primary mb-6">
+              About Our Library
+            </h1>
+            <p className="font-paragraph text-lg text-primary mb-6">
+              {libraryInfo?.content || 'A cornerstone of our community, dedicated to providing access to knowledge, fostering learning, and creating connections through the power of books and resources.'}
+            </p>
+            {libraryInfo?.dateEstablished && (
+              <div className="flex items-center gap-2 font-paragraph text-base text-primary mb-4">
+                <Calendar className="w-5 h-5" />
+                <span>Established: {format(new Date(libraryInfo.dateEstablished), 'MMMM d, yyyy')}</span>
+              </div>
+            )}
+          </div>
+          
+          {libraryInfo?.mainImage && (
+            <div className="rounded-3xl overflow-hidden">
+              <Image
+                src={libraryInfo.mainImage}
+                alt="Library building"
+                className="w-full h-full object-cover"
+                width={800}
+              />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Mission and Vision */}
+      {libraryInfo && (
+        <section className="max-w-[100rem] mx-auto px-6 mt-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {libraryInfo.missionStatement && (
+              <div className="bg-secondary rounded-3xl p-8">
+                <h2 className="font-heading text-3xl font-bold text-primary mb-4">
+                  Our Mission
+                </h2>
+                <p className="font-paragraph text-base text-primary leading-relaxed">
+                  {libraryInfo.missionStatement}
+                </p>
+              </div>
+            )}
+            
+            {libraryInfo.visionStatement && (
+              <div className="bg-secondary rounded-3xl p-8">
+                <h2 className="font-heading text-3xl font-bold text-primary mb-4">
+                  Our Vision
+                </h2>
+                <p className="font-paragraph text-base text-primary leading-relaxed">
+                  {libraryInfo.visionStatement}
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Library Stats */}
+      <section className="max-w-[100rem] mx-auto px-6 mt-20">
+        <h2 className="font-heading text-4xl font-bold text-primary text-center mb-12">
+          By The Numbers
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="text-center bg-background rounded-2xl p-8 border-2 border-secondary">
+            <div className="w-16 h-16 rounded-full bg-secondary mx-auto mb-4 flex items-center justify-center">
+              <Users className="w-8 h-8 text-primary" />
+            </div>
+            <p className="font-heading text-4xl font-bold text-primary mb-2">15,000+</p>
+            <p className="font-paragraph text-base text-primary">Active Members</p>
+          </div>
+          
+          <div className="text-center bg-background rounded-2xl p-8 border-2 border-secondary">
+            <div className="w-16 h-16 rounded-full bg-secondary mx-auto mb-4 flex items-center justify-center">
+              <Calendar className="w-8 h-8 text-primary" />
+            </div>
+            <p className="font-heading text-4xl font-bold text-primary mb-2">70+</p>
+            <p className="font-paragraph text-base text-primary">Years of Service</p>
+          </div>
+          
+          <div className="text-center bg-background rounded-2xl p-8 border-2 border-secondary">
+            <div className="w-16 h-16 rounded-full bg-secondary mx-auto mb-4 flex items-center justify-center">
+              <MapPin className="w-8 h-8 text-primary" />
+            </div>
+            <p className="font-heading text-4xl font-bold text-primary mb-2">3</p>
+            <p className="font-paragraph text-base text-primary">Branch Locations</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Photo Gallery */}
+      {photos.length > 0 && (
+        <section className="max-w-[100rem] mx-auto px-6 mt-20 mb-20">
+          <h2 className="font-heading text-4xl font-bold text-primary mb-8">
+            Our Spaces
+          </h2>
+          <p className="font-paragraph text-lg text-primary mb-8">
+            Explore our beautiful library facilities and community spaces
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {photos.map((photo) => (
+              <div
+                key={photo._id}
+                className="group rounded-2xl overflow-hidden bg-secondary/20 hover:shadow-lg transition-all"
+              >
+                {photo.photo && (
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={photo.photo}
+                      alt={photo.photoTitle || 'Library photo'}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      width={600}
+                    />
+                  </div>
+                )}
+                <div className="p-4">
+                  {photo.photoTitle && (
+                    <h3 className="font-heading text-lg font-bold text-primary mb-2">
+                      {photo.photoTitle}
+                    </h3>
+                  )}
+                  {photo.photoDescription && (
+                    <p className="font-paragraph text-sm text-primary mb-2">
+                      {photo.photoDescription}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2 text-xs font-paragraph text-primary">
+                    {photo.location && (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {photo.location}
+                      </span>
+                    )}
+                    {photo.dateTaken && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {format(new Date(photo.dateTaken), 'MMM yyyy')}
+                      </span>
+                    )}
+                  </div>
+                  {photo.photographer && (
+                    <p className="font-paragraph text-xs text-primary mt-2 italic">
+                      Photo by {photo.photographer}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Call to Action */}
+      <section className="max-w-[100rem] mx-auto px-6 mb-20">
+        <div className="bg-primary rounded-3xl p-12 text-center">
+          <h2 className="font-heading text-4xl font-bold text-primary-foreground mb-4">
+            Visit Us Today
+          </h2>
+          <p className="font-paragraph text-lg text-primary-foreground mb-8 max-w-2xl mx-auto">
+            Experience the warmth of our community and discover the resources waiting for you
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <a
+              href="#contact"
+              className="px-8 py-3 rounded-full bg-secondary text-secondary-foreground font-paragraph text-sm font-medium hover:bg-secondary/90 transition-colors"
+            >
+              Get Directions
+            </a>
+            <a
+              href="/catalog"
+              className="px-8 py-3 rounded-full bg-primary-foreground text-primary font-paragraph text-sm font-medium hover:bg-primary-foreground/90 transition-colors"
+            >
+              Browse Catalog
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}
