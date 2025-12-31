@@ -22,47 +22,60 @@ export default function Header() {
     }
   };
   
+  // Navigation labels based on language
+  const navLabels = isMLPage ? {
+    home: 'ഹോം',
+    catalog: 'പുസ്തക കാറ്റലോഗ്',
+    about: 'ലൈബ്രറിയെ കുറിച്ച്',
+    libraryName: 'നദീതീര പൊതു ലൈബ്രറി'
+  } : {
+    home: 'Home',
+    catalog: 'Book Catalog',
+    about: 'About Library',
+    libraryName: 'Riverside Public Library'
+  };
+
   return (
     <header className="bg-background border-b border-primary/10">
       <div className="max-w-[120rem] mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={isMLPage ? '/home-ml' : '/'} className="flex items-center gap-2">
             <BookOpen className="w-6 h-6 text-primary" />
             <span className="font-heading text-xl font-bold text-primary">
-              Riverside Public Library
+              {navLabels.libraryName}
             </span>
           </Link>
           
           <nav className="flex items-center gap-3">
             <Link
-              to="/"
+              to={isMLPage ? '/home-ml' : '/'}
               className={`px-5 py-2 rounded-full font-paragraph text-sm transition-colors ${
-                isActive('/')
+                (isMLPage ? isActive('/home-ml') : isActive('/'))
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-transparent text-primary hover:bg-secondary'
               }`}
             >
-              Home
+              {navLabels.home}
             </Link>
             <Link
-              to="/catalog"
+              to={isMLPage ? '/catalog-ml' : '/catalog'}
               className={`px-5 py-2 rounded-full font-paragraph text-sm transition-colors ${
-                isActive('/catalog')
+                (isMLPage ? isActive('/catalog-ml') : isActive('/catalog'))
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-transparent text-primary hover:bg-secondary'
               }`}
             >
-              Book Catalog
+              {navLabels.catalog}
             </Link>
             <Link
-              to="/about"
+              to={isMLPage ? '/about-ml' : '/about'}
               className={`px-5 py-2 rounded-full font-paragraph text-sm transition-colors ${
-                isActive('/about')
+                (isMLPage ? isActive('/about-ml') : isActive('/about'))
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-transparent text-primary hover:bg-secondary'
               }`}
             >
-              About Library
+              {navLabels.about}
             </Link>
             
             {/* Language Switcher */}
