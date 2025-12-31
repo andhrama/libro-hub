@@ -7,6 +7,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookDetailDialog from '@/components/BookDetailDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// GOOGLE SHEETS INTEGRATION: Import the Google Sheets service
+import { fetchBooksFromGoogleSheets } from '@/services/googleSheetsService';
 
 export default function CatalogPage() {
   const [books, setBooks] = useState<BookCatalog[]>([]);
@@ -20,7 +22,13 @@ export default function CatalogPage() {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const { items } = await BaseCrudService.getAll<BookCatalog>('bookcatalog');
+      // GOOGLE SHEETS INTEGRATION: Fetch books from Google Sheets API
+      // This line shows where the Google Sheets integration happens:
+      const sheetsBooks = await fetchBooksFromGoogleSheets();
+      
+      // Fallback to CMS if Google Sheets fetch fails or returns empty
+      const items = sheetsBooks.length > 0 ? sheetsBooks : (await BaseCrudService.getAll<BookCatalog>('bookcatalog')).items;
+      
       setBooks(items);
       setFilteredBooks(items);
       
